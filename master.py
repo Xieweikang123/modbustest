@@ -1,4 +1,4 @@
-from pymodbus.client.sync import ModbusTcpClient
+from pymodbus.client import ModbusTcpClient
 import logging
 
 logging.basicConfig()
@@ -10,8 +10,8 @@ def run_client():
     client.connect()
     print('连接到 Modbus TCP 从站 127.0.0.1:5020')
 
-    # 读取保持寄存器（地址0-9）
-    rr = client.read_holding_registers(0, 10, unit=1)
+    # 尝试 unit=0
+    rr = client.read_holding_registers(0, 9, unit=0)
     if rr.isError():
         print('读取失败:', rr)
     else:
