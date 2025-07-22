@@ -14,7 +14,7 @@ def run_client():
         return
     print('连接到 Modbus RTU 从站 COM10，波特率9600')
 
-    rr = client.read_holding_registers(address=0, count=1, slave=1)
+    rr = client.read_holding_registers(address=0, count=6, slave=1)
     print('请求已发送，等待响应...')
     if rr.isError():
         print('读取失败:', rr)

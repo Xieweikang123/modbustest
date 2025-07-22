@@ -3,24 +3,35 @@ logging.basicConfig()
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
+import asyncio
 from pymodbus.server import StartSerialServer
 from pymodbus.datastore import ModbusSequentialDataBlock, ModbusSlaveContext, ModbusServerContext
 import serial
 import time
 
 class LoggingDataBlock(ModbusSequentialDataBlock):
+    def __init__(self, address, values):
+        print("LoggingDataBlock 初始化")
+        super().__init__(address, values)
+
     def getValues(self, address, count=1):
         print(f"收到主站读请求：地址={address}, 数量={count}")
+        # 重要！记得打印一下 self.values
+        print(f"当前寄存器数据区: {self.values}")
         return super().getValues(address, count)
+
     def setValues(self, address, values):
         print(f"收到主站写请求：地址={address}, 值={values}")
         super().setValues(address, values)
 
+
 def get_context():
     store = ModbusSlaveContext(
-        hr=LoggingDataBlock(0, list(range(10)))
+        # hr=LoggingDataBlock(0, list(range(10)))
+        hr=LoggingDataBlock(0, [11, 22, 33, 44, 55, 66])
+
     )
-    context = ModbusServerContext(slaves=store, single=True)
+    context = ModbusServerContext(slaves={1: store}, single=False)
     return context
 
 def send_test_message():
@@ -33,10 +44,10 @@ def send_test_message():
     except Exception as e:
         print(f"发送测试消息失败: {e}")
 
-def run_server():
+async def run_server():
     context = get_context()
     print('Modbus RTU 从站启动，监听 COM11，波特率9600')
-    StartSerialServer(
+    await StartSerialServer(
         context=context,
         port='COM11',
         baudrate=9600,
@@ -47,5 +58,13 @@ def run_server():
     )
 
 if __name__ == "__main__":
-    send_test_message()
-    run_server() 
+    print('Modbus RTU 从站启动，监听 COM11，波特率9600')
+    StartSerialServer(
+        context=get_context(),
+        port='COM11',
+        baudrate=9600,
+        stopbits=1,
+        bytesize=8,
+        parity='N',
+        timeout=1
+    ) 
