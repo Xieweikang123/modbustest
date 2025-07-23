@@ -27,11 +27,9 @@ class LoggingDataBlock(ModbusSequentialDataBlock):
 
 def get_context():
     store = ModbusSlaveContext(
-        # hr=LoggingDataBlock(0, list(range(10)))
-        hr=LoggingDataBlock(0, [11, 22, 33, 44, 55, 66])
-
+        hr=LoggingDataBlock(0, list(range(10)))
     )
-    context = ModbusServerContext(slaves={1: store}, single=False)
+    context = ModbusServerContext(slaves=store, single=True)
     return context
 
 def send_test_message():
